@@ -1,0 +1,322 @@
+{
+  "info": {
+    "_postman_id": "sdn302-practice-exam",
+    "name": "SDN302 Practice Exam - Customer Product Order API",
+    "description": "Postman Collection for SDN302 Practical Exam",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9999",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sampleProductId",
+      "value": "6936f4c6f2937fc51e5f7cab",
+      "type": "string"
+    },
+    {
+      "key": "newProductId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check - Root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        }
+      }
+    },
+    {
+      "name": "1. Task 02 - Auth Tokens (Success)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "    pm.collectionVariables.set('token', jsonData.token);",
+              "    console.log('Token saved:', jsonData.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"storeadmin\",\n  \"pass\": \"Store@123\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/tokens",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "tokens"]
+        }
+      }
+    },
+    {
+      "name": "2. Task 02 - Auth Tokens (Fail - 401)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"storeadmin\",\n  \"pass\": \"WrongPassword\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/tokens",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth", "tokens"]
+        }
+      }
+    },
+    {
+      "name": "3. Task 03 - GET /api/products (Unauthorized - 401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        }
+      }
+    },
+    {
+      "name": "4. Task 03 - GET /api/products (Authorized - 200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        }
+      }
+    },
+    {
+      "name": "5. Task 03 - GET /api/products/:id (Success - 200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/{{sampleProductId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "{{sampleProductId}}"]
+        }
+      }
+    },
+    {
+      "name": "6. Task 03 - GET /api/products/:id (Not Found - 404)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/666666666666666666666666",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "666666666666666666666666"]
+        }
+      }
+    },
+    {
+      "name": "7. Task 03 - POST /api/products (Success - 201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData._id) {",
+              "    pm.collectionVariables.set('newProductId', jsonData._id);",
+              "    console.log('Created product ID:', jsonData._id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Sony WH-1000XM5\",\n  \"price\": 8900000,\n  \"category\": \"Headphones\",\n  \"stock\": 15\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        }
+      }
+    },
+    {
+      "name": "8. Task 03 - POST /api/products (Validation Error - 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"price\": -50000,\n  \"category\": \"\",\n  \"stock\": -5\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        }
+      }
+    },
+    {
+      "name": "9. Task 03 - PUT /api/products/:id (Success - 200)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"price\": 34000000,\n  \"stock\": 25\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products/{{sampleProductId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "{{sampleProductId}}"]
+        }
+      }
+    },
+    {
+      "name": "10. Task 03 - DELETE /api/products/:id (Referenced in Order - Reject 409)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/{{sampleProductId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "{{sampleProductId}}"]
+        }
+      }
+    },
+    {
+      "name": "11. Task 03 - DELETE /api/products/:id (Not in Order - Success 200)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/{{newProductId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "{{newProductId}}"]
+        }
+      }
+    },
+    {
+      "name": "12. GET /api/orders (Protected - 200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/orders",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "orders"]
+        }
+      }
+    },
+    {
+      "name": "13. GET /api/customers (Protected - 200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/customers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "customers"]
+        }
+      }
+    }
+  ]
+}
